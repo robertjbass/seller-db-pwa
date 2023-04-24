@@ -5,6 +5,8 @@ import {
   signInWithPopup,
   User,
 } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getFirestoreDoc, updateFirestoreDoc } from "./firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDX4ronWwG7v7-Egdfspb6ZeVHxyI5-eJg",
@@ -18,11 +20,34 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 export const signInWithGoogle = async (): Promise<User | null> => {
   const provider = new GoogleAuthProvider();
   const result = await signInWithPopup(auth, provider);
-  return result?.user || null;
+  if (result.user.email) {
+    const { data, exists, id } = await getFirestoreDoc(
+      "user",
+      result.user.email
+    );
+    if (!exists) {
+      const { error, success } = await updateFirestoreDoc(
+        "user",
+        result.user.email,
+        {
+          uid: result.user.uid,
+          active: true,
+        }
+      );
+
+      if (!success) console.error(error);
+    }
+    console.log(data, exists, id);
+  }
+  if (result?.user?.uid && result?.user?.email) {
+    return result.user;
+  }
+  return null;
 };
 
 export const signOut = () => {

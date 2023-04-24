@@ -1,31 +1,18 @@
-import { useEffect, useContext } from "react";
+import { useContext } from "react";
 import { GlobalContext } from "@/context/GlobalContext";
 import { FcGoogle } from "react-icons/fc";
-import { auth, signInWithGoogle } from "@/services/firebase";
-import { getRedirectResult } from "firebase/auth";
+import { signInWithGoogle } from "@/services/firebase";
 
 const Login = () => {
-  const { user, setUser, setGlobalLoading } = useContext(GlobalContext);
-
-  useEffect(() => {
-    if (!user) {
-      try {
-        getRedirectResult(auth)
-          .then((result) => {
-            if (result?.user) setUser(result.user);
-          })
-          .then(() => {
-            setGlobalLoading(false);
-          });
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }, []);
+  const { setUser, setGlobalLoading } = useContext(GlobalContext);
 
   const signInHandler = async () => {
     setGlobalLoading(true);
-    await signInWithGoogle();
+    const user = await signInWithGoogle();
+    if (user) {
+      setGlobalLoading(false);
+      setUser(user);
+    }
   };
 
   return (

@@ -1,36 +1,31 @@
 import { User } from "firebase/auth";
+import { signOut } from "@/services/firebase";
 import React, { createContext, useReducer } from "react";
+import { getFromCache, upperSnakeToCamel } from "./helpers";
 
-type Action = {
-  type: any;
-  payload?: any;
-};
+type Action = { type: string; payload?: any };
 
 type State = {
   user: User | null;
   globalLoading: boolean;
   setGlobalLoading: (loading: boolean) => void;
   setUser: (user: User) => void;
+  logOut: () => void;
 };
 
 const initialState: State = {
-  user: null,
-  globalLoading: localStorage.getItem("globalLoading") === "true" || false,
+  user: getFromCache("user") || null,
+  globalLoading: false,
   setGlobalLoading: () => {},
   setUser: () => {},
+  logOut: () => {},
 };
 
-const userReducer = (state: State, action: Action) => {
-  switch (action.type) {
-    case "SET_USER":
-      localStorage.setItem("globalLoading", JSON.stringify(false));
-      return { ...state, user: action.payload };
-    case "SET_GLOBAL_LOADING":
-      localStorage.setItem("globalLoading", JSON.stringify(action.payload));
-      return { ...state, globalLoading: action.payload };
-    default:
-      return state;
-  }
+const reducer = (state: State, action: Action) => {
+  const varName = upperSnakeToCamel(action.type);
+  const newState = { ...state, [varName]: action.payload };
+  localStorage.setItem("sellerDbCache", JSON.stringify(newState));
+  return newState;
 };
 
 export const GlobalContext = createContext(initialState);
@@ -38,7 +33,7 @@ export const GlobalContext = createContext(initialState);
 export const GlobalProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const [state, dispatch] = useReducer(userReducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const setUser = (user: User) => {
     dispatch({ type: "SET_USER", payload: user });
@@ -48,9 +43,16 @@ export const GlobalProvider: React.FC<{
     dispatch({ type: "SET_GLOBAL_LOADING", payload: globalLoading });
   };
 
+  const logOut = () => {
+    signOut();
+    dispatch({ type: "SET_USER", payload: null });
+    localStorage.removeItem("sellerDbCache");
+  };
+
   const actions = {
     setUser,
     setGlobalLoading,
+    logOut,
   };
 
   const stateValues: State & typeof actions = {

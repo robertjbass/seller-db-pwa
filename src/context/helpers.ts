@@ -1,14 +1,3 @@
-export const getFromCache = (key: string) => {
-  const cache = localStorage.getItem("sellerDbCache") || "{}";
-  const parsedValue = JSON.parse(cache)[key];
-
-  return parsedValue === "true"
-    ? true
-    : parsedValue === "false"
-    ? false
-    : parsedValue;
-};
-
 export const upperSnakeToCamel = (str: string) => {
   str = str.replace("SET_", "");
   const words = str.toLowerCase().split("_");

@@ -2,12 +2,10 @@ import { useContext } from "react";
 import { GlobalContext } from "@/context/GlobalContext";
 
 const TopBar = () => {
-  const navbarColor = "bg-white";
-
   const { user, logOut } = useContext(GlobalContext);
   return (
     <div
-      className={`h-16 fixed top-0 left-0 w-full border-b-2 z-10 p-4 flex justify-between ${navbarColor}`}
+      className={`h-16 fixed top-0 left-0 w-full border-b-2 z-10 p-4 flex justify-between bg-white`}
     >
       <div className="flex">
         {user ? (

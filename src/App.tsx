@@ -72,24 +72,8 @@ const App = () => {
     }
   };
 
-  // const View = () => {}
-
-  return (
-    <>
-      <TopBar />
-
-      <div className="absolute top-0 py-20 px-4 overflow-y z-5 w-full">
-        {view === "camera" ? (
-          <div className="w-full h-full flex flex-col justify-between">
-            <video className="rounded" ref={viewRef} />
-          </div>
-        ) : view === "preview" ? (
-          <PreviewView />
-        ) : (
-          <HomeView />
-        )}
-      </div>
-
+  const Footer = () => {
+    return (
       <div
         className={`h-16 fixed bottom-0 left-0 w-full border-t-2 z-10 p-4 flex justify-between bg-white`}
       >
@@ -122,6 +106,26 @@ const App = () => {
           )}
         </div>
       </div>
+    );
+  };
+
+  return (
+    <>
+      <TopBar />
+
+      <div className="absolute top-0 py-20 px-4 overflow-y z-5 w-full">
+        {view === "camera" ? (
+          <div className="w-full h-full flex flex-col justify-between">
+            <video className="rounded" ref={viewRef} />
+          </div>
+        ) : view === "preview" ? (
+          <PreviewView />
+        ) : (
+          <HomeView />
+        )}
+      </div>
+
+      <Footer />
     </>
   );
 };
